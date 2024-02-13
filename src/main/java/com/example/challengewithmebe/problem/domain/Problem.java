@@ -1,18 +1,20 @@
 package com.example.challengewithmebe.problem.domain;
 
 import com.example.challengewithmebe.global.domain.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class Problem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +26,7 @@ public class Problem extends BaseEntity {
     private String title; //제목=이름
     private String imgUrl; //이미지url
     private String description; //설명
+
+    @OneToMany(mappedBy = "problem")
+    private List<Testcase> testcases = new ArrayList<>();
 }
