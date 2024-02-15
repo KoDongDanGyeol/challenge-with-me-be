@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubmitResult {
-    private String errorMsg;
-    private String accuracyTest;
-    private boolean isPassed;
+public class ParamDto {
+    private List<Object> paramTypes;
+    private List<Object> testcases;
+    private List<Object> result;
 }

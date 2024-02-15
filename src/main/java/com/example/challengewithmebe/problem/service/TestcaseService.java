@@ -1,6 +1,7 @@
 package com.example.challengewithmebe.problem.service;
 
 
+import com.example.challengewithmebe.ide.model.ParamDto;
 import com.example.challengewithmebe.ide.model.RunResult;
 import com.example.challengewithmebe.ide.model.SubmitResult;
 import com.example.challengewithmebe.ide.util.CompileBuilder;
@@ -24,22 +25,6 @@ public class TestcaseService {
     private final TestcaseRepository testcaseRepository;
     private final CompileBuilder compileBuilder;
 
-    // {problemId}에 대한 공개 테스트 케이스만 가져온다.
-    public List<Testcase> findOpenTestcasesById(Long problemId) {
-        return testcaseRepository.findAll().stream()
-                .filter(tc -> tc.getProblem().getId().equals(problemId))
-                .filter(tc -> tc.getIsHidden().equals(false))
-                .collect(Collectors.toList());
-    }
-
-    // {problemId}에 대한 히든 테스트 케이스만 가져온다.
-    public List<Testcase> findHiddenTestcasesById(Long problemId) {
-        return testcaseRepository.findAll().stream()
-                .filter(tc -> tc.getProblem().getId().equals(problemId))
-                .filter(tc -> tc.getIsHidden().equals(true))
-                .collect(Collectors.toList());
-    }
-
     // 코드 실행
     public List<RunResult> run(Long problemId, String inputCode) throws Exception {
         List<RunResult> returnList = new ArrayList<>();
@@ -50,9 +35,9 @@ public class TestcaseService {
             return returnList;
         }
 
-        List<Testcase> testCases = findOpenTestcasesById(problemId);
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsFalse(problemId);
         for (Testcase testCase : testCases) {
-
+            boolean passed = false;
             long beforeTime = System.currentTimeMillis();
             String[] inputs = testCase.getInputData().split("#");
             String[] resultDtoInput = new String[inputs.length];
@@ -65,6 +50,7 @@ public class TestcaseService {
             for (String input : inputs) {
                 String[] _input = input.split(":");
                 switch (_input[0]) {
+
                     case "int" -> {
                         methodParamClass[i] = int.class;
                         methodParamObject[i++] = Integer.parseInt(_input[1]);
@@ -75,9 +61,19 @@ public class TestcaseService {
                         methodParamObject[i++] = _input[1];
                     }
 
-                    case "List" -> {
+                    case "int[]" -> {
                         methodParamClass[i] = int[].class;
                         methodParamObject[i++] = new Gson().fromJson(_input[1], int[].class);
+                    }
+
+                    case "int[][]" -> {
+                        methodParamClass[i] = int[][].class;
+                        methodParamObject[i++] = new Gson().fromJson(_input[1], int[][].class);
+                    }
+
+                    case "long" -> {
+                        methodParamClass[i] = long.class;
+                        methodParamObject[i++] = Long.parseLong(_input[1]);
                     }
 
                 }
@@ -90,12 +86,12 @@ public class TestcaseService {
 
             if (result.toString().equals(testCase.getOutputData())) {
                 rr = "테스트를 통과하였습니다.";
+                passed = true;
             } else {
                 rr = String.format("실행한 결괏값 %s이 기댓값 %s과 다릅니다.", result, testCase.getOutputData());
             }
 
-            // t[1]: 입력값, output: 기댓값, result: 결과값
-            returnList.add(new RunResult(resultDtoInput, testCase.getOutputData(), rr, (afterTime - beforeTime)));
+            returnList.add(new RunResult(resultDtoInput, testCase.getOutputData(), rr, (afterTime - beforeTime), passed));
         }
 
 
@@ -108,13 +104,13 @@ public class TestcaseService {
 
         Object obj = compileBuilder.compileCode(inputCode);
         if (obj instanceof String) {
-            returnList.add(new SubmitResult("컴파일 에러", null));
+            returnList.add(new SubmitResult("컴파일 에러", null, false));
             return returnList;
         }
 
-        List<Testcase> testCases = findHiddenTestcasesById(problemId);
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsTrue(problemId);
         for (Testcase testCase : testCases) {
-
+            boolean passed = false;
             long beforeTime = System.currentTimeMillis();
             String[] inputs = testCase.getInputData().split("#");
             String[] resultDtoInput = new String[inputs.length];
@@ -128,6 +124,7 @@ public class TestcaseService {
             for (String input : inputs) {
                 String[] _input = input.split(":");
                 switch (_input[0]) {
+
                     case "int" -> {
                         methodParamClass[i] = int.class;
                         methodParamObject[i++] = Integer.parseInt(_input[1]);
@@ -138,9 +135,19 @@ public class TestcaseService {
                         methodParamObject[i++] = _input[1];
                     }
 
-                    case "List" -> {
+                    case "int[]" -> {
                         methodParamClass[i] = int[].class;
                         methodParamObject[i++] = new Gson().fromJson(_input[1], int[].class);
+                    }
+
+                    case "int[][]" -> {
+                        methodParamClass[i] = int[][].class;
+                        methodParamObject[i++] = new Gson().fromJson(_input[1], int[][].class);
+                    }
+
+                    case "long" -> {
+                        methodParamClass[i] = long.class;
+                        methodParamObject[i++] = Long.parseLong(_input[1]);
                     }
 
                 }
@@ -153,15 +160,42 @@ public class TestcaseService {
 
             if (result.toString().equals(testCase.getOutputData())) {
                 rr = String.format("통과 (수행시간 : %s)", (afterTime - beforeTime));
-                // successCount++;
+                passed = true;
             } else {
                 rr = String.format("실패 (수행시간 : %s)", (afterTime - beforeTime));
             }
 
-            returnList.add(new SubmitResult(null, rr));
+            returnList.add(new SubmitResult(null, rr, passed));
         }
         return returnList;
 
+    }
+
+    public ParamDto getParamTypesAndTestcases(Long problemId) {
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsFalse(problemId);
+
+        List<Object> params = new ArrayList<>();
+        List<Object> tcs = new ArrayList<>();
+        List<Object> results = new ArrayList<>();
+
+        for (Testcase testCase : testCases) {
+            String[] inputs = testCase.getInputData().split("#");
+
+            List<String> _params = new ArrayList<>();
+            List<String> _tcs = new ArrayList<>();
+            for (String input : inputs) {
+                String[] _input = input.split(":");
+                _params.add(_input[0]);
+                _tcs.add(_input[1]);
+            }
+            if (params.isEmpty())
+                params.add(_params);
+            tcs.add(_tcs);
+            results.add(testCase.getOutputData());
+        }
+
+
+        return new ParamDto(params, tcs, results);
     }
 
 }

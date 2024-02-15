@@ -1,9 +1,6 @@
 package com.example.challengewithmebe.ide.controller;
 
-import com.example.challengewithmebe.ide.model.RunResult;
-import com.example.challengewithmebe.ide.model.RunResultDto;
-import com.example.challengewithmebe.ide.model.SubmitResult;
-import com.example.challengewithmebe.ide.model.SubmitResultDto;
+import com.example.challengewithmebe.ide.model.*;
 import com.example.challengewithmebe.problem.service.TestcaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +19,7 @@ public class IdeController {
     @PostMapping("/{problemId}/run")
     public ResponseEntity<RunResultDto> run(@RequestBody Map<String, Object> input, @PathVariable(name = "problemId") Long problemId) throws Exception {
         List<RunResult> result = testcaseService.run(problemId, input.get("code").toString());
-        return ResponseEntity.ok(new RunResultDto(result));
+        return ResponseEntity.ok(new RunResultDto("run", result));
     }
 
 
@@ -30,6 +27,11 @@ public class IdeController {
     public ResponseEntity<SubmitResultDto> submit(@RequestBody Map<String, Object> input, @PathVariable(name = "problemId") Long problemId) throws Exception {
         List<RunResult> result = testcaseService.run(problemId, input.get("code").toString());
         List<SubmitResult> submits = testcaseService.submit(problemId, input.get("code").toString());
-        return ResponseEntity.ok(new SubmitResultDto(result, submits));
+        return ResponseEntity.ok(new SubmitResultDto("submit", result, submits));
+    }
+
+    @GetMapping("/{problemId}/testcase")
+    public ResponseEntity<ParamDto> getParamAndTypes(@PathVariable(name = "problemId") Long problemId) {
+        return ResponseEntity.ok(testcaseService.getParamTypesAndTestcases(problemId));
     }
 }

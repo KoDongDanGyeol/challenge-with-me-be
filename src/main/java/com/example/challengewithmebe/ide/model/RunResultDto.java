@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RunResultDto<T> {
+    private String submitType;
     private T runResult;
 }

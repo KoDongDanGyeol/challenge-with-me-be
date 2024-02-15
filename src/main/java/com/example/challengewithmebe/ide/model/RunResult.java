@@ -12,12 +12,14 @@ public class RunResult<T> {
     private String output;
     private Long performance;
     private String errorMsg;
+    private boolean isPassed;
 
-    public RunResult(T input, String expected, String output, Long performance) {
+    public RunResult(T input, String expected, String output, Long performance, boolean isPassed) {
         this.input = input;
         this.expected = expected;
         this.output = output;
         this.performance = performance;
+        this.isPassed = isPassed;
     }
 
     public RunResult(String errorMsg) {
