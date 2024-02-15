@@ -1,4 +1,4 @@
-package com.example.challengewithmebe.global.domain;
+package com.example.challengewithmebe.global.app.domain;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
