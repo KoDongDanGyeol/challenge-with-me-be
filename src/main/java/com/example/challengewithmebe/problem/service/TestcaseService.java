@@ -4,6 +4,7 @@ package com.example.challengewithmebe.problem.service;
 import com.example.challengewithmebe.ide.model.ParamDto;
 import com.example.challengewithmebe.ide.model.RunResult;
 import com.example.challengewithmebe.ide.model.SubmitResult;
+import com.example.challengewithmebe.ide.model.TestcaseDto;
 import com.example.challengewithmebe.ide.util.CompileBuilder;
 import com.example.challengewithmebe.problem.domain.Testcase;
 import com.example.challengewithmebe.problem.repository.TestcaseRepository;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -84,7 +84,8 @@ public class TestcaseService {
             Object result = method.invoke(obj, methodParamObject);
             long afterTime = System.currentTimeMillis();
 
-            if (result.toString().equals(testCase.getOutputData())) {
+            String[] outputTypeAndValue = testCase.getOutputData().split(":");
+            if (result.toString().equals(outputTypeAndValue[1])) {
                 rr = "테스트를 통과하였습니다.";
                 passed = true;
             } else {
@@ -158,7 +159,8 @@ public class TestcaseService {
             Object result = method.invoke(obj, methodParamObject);
             long afterTime = System.currentTimeMillis();
 
-            if (result.toString().equals(testCase.getOutputData())) {
+            String[] outputTypeAndValue = testCase.getOutputData().split(":");
+            if (result.toString().equals(outputTypeAndValue[1])) {
                 rr = String.format("통과 (수행시간 : %s)", (afterTime - beforeTime));
                 passed = true;
             } else {
@@ -174,28 +176,34 @@ public class TestcaseService {
     public ParamDto getParamTypesAndTestcases(Long problemId) {
         List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsFalse(problemId);
 
-        List<Object> params = new ArrayList<>();
-        List<Object> tcs = new ArrayList<>();
-        List<Object> results = new ArrayList<>();
+        TestcaseDto testcaseDto = new TestcaseDto();
+        List<TestcaseDto> testcaseValues = new ArrayList<>();
 
         for (Testcase testCase : testCases) {
+            String[] testcaseValueAndType = testCase.getOutputData().split(":");
             String[] inputs = testCase.getInputData().split("#");
 
-            List<String> _params = new ArrayList<>();
-            List<String> _tcs = new ArrayList<>();
+            List<String> testcaseType = new ArrayList<>();
+            List<String> testcaseValue = new ArrayList<>();
+
             for (String input : inputs) {
                 String[] _input = input.split(":");
-                _params.add(_input[0]);
-                _tcs.add(_input[1]);
+                testcaseType.add(_input[0]);
+                testcaseValue.add(_input[1]);
             }
-            if (params.isEmpty())
-                params.add(_params);
-            tcs.add(_tcs);
-            results.add(testCase.getOutputData());
+
+            if (testcaseDto.getInput() == null) {
+                testcaseDto.setInput(testcaseType);
+                testcaseDto.setExpected(testcaseValueAndType[0]);
+            }
+
+
+            testcaseValues.add(new TestcaseDto(testcaseValue,testcaseValueAndType[1]));
+
         }
 
 
-        return new ParamDto(params, tcs, results);
+        return new ParamDto(testcaseDto, testcaseValues);
     }
 
 }

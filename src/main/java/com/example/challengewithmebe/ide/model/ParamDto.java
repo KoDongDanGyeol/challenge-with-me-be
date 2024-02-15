@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParamDto {
-    private List<Object> paramTypes;
-    private List<Object> testcases;
-    private List<Object> result;
+    private TestcaseDto testcaseTypes;
+    private List<TestcaseDto> testcaseValues;
 }
