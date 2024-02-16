@@ -38,8 +38,12 @@ public class ChatService {
     public List<MessageDTO> makeMessages(MessageDTO messageDTO){
         MessageDTO systemMessage = MessageDTO.builder()
                 .role("system")
-                .content("You're a senior developer helping a questioner solve a coding test.")
-                //todo : 상세 내용 추가 필요.
+                .content("Acting as a senior developer advising students tackling coding tests.\n" +
+                        "Put the response in JSON format with a string value " +
+                        "having 'description' as the key. " +
+                        "If the response includes code, " +
+                        "place it under the key named 'code'." +
+                        "Except for the code, all responses should be in Korean.")
                 .build();
 
         List<MessageDTO> messages = new ArrayList<>();
@@ -55,7 +59,6 @@ public class ChatService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         List<MessageDTO> messages = makeMessages(messageDTO);
-
 
         PromptDTO requestBody = PromptDTO.builder()
                 .temperature(0.4)
