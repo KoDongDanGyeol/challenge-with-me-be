@@ -35,7 +35,7 @@ public class TestcaseService {
             return returnList;
         }
 
-        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsFalse(problemId);
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndIsHiddenIsFalse(problemId);
         for (Testcase testCase : testCases) {
             boolean passed = false;
             long beforeTime = System.currentTimeMillis();
@@ -109,7 +109,7 @@ public class TestcaseService {
             return returnList;
         }
 
-        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsTrue(problemId);
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndIsHiddenIsTrue(problemId);
         for (Testcase testCase : testCases) {
             boolean passed = false;
             long beforeTime = System.currentTimeMillis();
@@ -174,7 +174,7 @@ public class TestcaseService {
     }
 
     public ParamDto getParamTypesAndTestcases(Long problemId) {
-        List<Testcase> testCases = testcaseRepository.findByProblemIdAndHiddenIsFalse(problemId);
+        List<Testcase> testCases = testcaseRepository.findByProblemIdAndIsHiddenIsFalse(problemId);
 
         TestcaseDto testcaseDto = new TestcaseDto();
         List<TestcaseDto> testcaseValues = new ArrayList<>();

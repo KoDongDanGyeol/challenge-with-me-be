@@ -1,0 +1,17 @@
+spring:
+  social:
+    google:
+      client_id: ${GOOGLE_CLIENT_ID}
+      client_secret: ${GOOGLE_SECRET}
+      redirect: http://localhost:8080/api/oauth/login/google
+      url:
+        login: https://accounts.google.com/o/oauth2/v2/auth
+        token: https://oauth2.googleapis.com/token
+        profile: https://www.googleapis.com/oauth2/v3/userinfo
+  jwt:
+    secretKey: ${JWT_SECRET}
+  data:
+    redis:
+      host: localhost
+      port: 6379
+

@@ -1,4 +1,4 @@
-package com.example.challengewithmebe.global.domain;
+package com.example.challengewithmebe.global.app.domain;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class BaseEntity {
 

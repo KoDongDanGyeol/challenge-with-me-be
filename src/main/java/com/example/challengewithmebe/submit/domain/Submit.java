@@ -1,6 +1,6 @@
 package com.example.challengewithmebe.submit.domain;
 
-import com.example.challengewithmebe.global.domain.BaseEntity;
+import com.example.challengewithmebe.global.app.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,5 +25,5 @@ public class Submit extends BaseEntity {
     private boolean isCorrect; //정답여부
     private String submitCode; //제출코드
     private String language; //언어
-    private String status; //문제 상태?
+    private String status; //푼 문제, 안 푼 문제
 }
