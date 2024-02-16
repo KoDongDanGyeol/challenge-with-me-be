@@ -1,13 +1,11 @@
 package com.example.challengewithmebe.login.service;
 
 import com.example.challengewithmebe.global.security.jwt.JwtProvider;
-import com.example.challengewithmebe.global.security.jwt.RefreshToken;
 import com.example.challengewithmebe.member.domain.Member;
 import com.example.challengewithmebe.member.domain.type.Role;
 import com.example.challengewithmebe.login.dto.response.LoginResponse;
 import com.example.challengewithmebe.login.dto.OAuthProfile;
 import com.example.challengewithmebe.member.repository.MemberRepository;
-import com.example.challengewithmebe.global.redis.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LoginService {
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
 
 
@@ -37,12 +34,7 @@ public class LoginService {
                     .providerId(oAuthProfile.getProviderId())
                     .build();
 
-            Member savedMember = memberRepository.save(member);
-
-            RefreshToken token = new RefreshToken(
-                    jwtProvider.createRefreshToken(), String.valueOf(savedMember.getId()));
-
-            refreshTokenRepository.save(token);
+            memberRepository.save(member);
             accessToken = jwtProvider.createAccessToken(String.valueOf(member.getId()));
         }
 

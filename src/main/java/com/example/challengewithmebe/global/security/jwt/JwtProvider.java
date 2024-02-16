@@ -27,7 +27,6 @@ public class JwtProvider {
     @Value("${spring.jwt.secretKey}")
     private String secretKey;
     public static final long TOKEN_VALID_TIME = 1000L * 60 * 60 * 24; //1일
-    public static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7; //7일
 
     @PostConstruct //초기화용
     public void init(){
@@ -42,16 +41,6 @@ public class JwtProvider {
                 .setClaims(claims)
                 .setExpiration(new Date(now.getTime()+TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-    }
-
-    public String createRefreshToken(){
-        Date now = new Date();
-
-        return Jwts.builder()
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+REFRESH_TOKEN_VALID_TIME))
-                .signWith(SignatureAlgorithm.HS256,secretKey)
                 .compact();
     }
 
