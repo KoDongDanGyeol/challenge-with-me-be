@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://challenge-with-me-database:3306/challenge?createDatabaseIfNotExist=true
+    username: ${SPRING_DATABASE_USERNAME}
+    password: ${SPRING_DATABASE_PASSWORD}
+  data:
+    redis:
+      host: challenge-with-me-redis
+      port: 6379
+  pharmacy:
+    recommendation:
+      base:
+        url: http://3.34.213.68/dir/
