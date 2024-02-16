@@ -14,4 +14,6 @@ spring:
     redis:
       host: localhost
       port: 6379
-
+openai:
+  secretKey: ${OPENAI_SECRET}
+  model: gpt-3.5-turbo-0125
