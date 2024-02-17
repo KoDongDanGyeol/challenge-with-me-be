@@ -10,8 +10,7 @@ spring:
         profile: https://www.googleapis.com/oauth2/v3/userinfo
   jwt:
     secretKey: ${JWT_SECRET}
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
+openai:
+  secretKey: ${OPENAI_SECRET}
+  model: gpt-3.5-turbo-0125
