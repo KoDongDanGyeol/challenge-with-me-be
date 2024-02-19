@@ -2,6 +2,6 @@ spring:
   profiles:
     active: prod
     group:
-      local:
+      prod:
         - common
 
