@@ -19,3 +19,4 @@ spring:
     recommendation:
       base:
         url: http://3.34.213.68/dir/
+        
