@@ -1,5 +1,6 @@
 package com.example.challengewithmebe.global.security.jwt;
 
+import com.example.challengewithmebe.global.exception.auth.NotValidTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -23,9 +24,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             Authentication authentication = jwtProvider.getAutentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        }else{
-            //todo : 에러코드 추가
-        }
+        }else throw new NotValidTokenException();
         chain.doFilter(request, response);
     }
 }
