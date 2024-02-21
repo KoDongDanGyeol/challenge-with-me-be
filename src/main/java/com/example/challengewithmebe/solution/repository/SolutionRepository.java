@@ -4,6 +4,7 @@ import com.example.challengewithmebe.submit.domain.Submit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -38,4 +39,9 @@ public interface SolutionRepository extends JpaRepository<Submit, Long> {
     Page<Object[]> findByIsCorrectTrueAndLanguageAndProblemId(@Param("language") String language,
                                                               @Param("problemId") Long problemId,
                                                             Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE Submit s SET s.memberId = null WHERE s.memberId = :memberId")
+    void updateMemberIdToNull(@Param("memberId") Long memberId);
+
 }

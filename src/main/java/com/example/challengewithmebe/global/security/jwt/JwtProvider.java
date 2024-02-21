@@ -1,5 +1,6 @@
 package com.example.challengewithmebe.global.security.jwt;
 
+import com.example.challengewithmebe.global.exception.auth.NotValidTokenException;
 import com.example.challengewithmebe.global.security.userdetails.CustomUserDetailService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -61,7 +62,9 @@ public class JwtProvider {
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(bearer!=null && bearer.startsWith("Bearer "))
             return bearer.substring("Bearer ".length());
-        return null ; //todo : 에러코드 추가
+        else{
+            throw new NotValidTokenException();
+        }
     }
 
     public boolean validateTokenExpirations(String token){

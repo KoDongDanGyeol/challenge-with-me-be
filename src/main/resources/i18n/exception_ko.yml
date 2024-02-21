@@ -1,0 +1,51 @@
+unknown:
+  code: "0000"
+  message: "알 수 없는 서버 에러가 발생했습니다."
+
+picture:
+  code: "1004"
+  message: "사진의 유형과 크기를 확인해주세요."
+
+notValidToken:
+  code: "0102"
+  message: "유효하지 않은 엑세스 토큰이에요."
+
+badRequest:
+  code: "1100"
+  message: "비정상적인 요청이에요."
+
+accessPermission:
+  code: "1101"
+  message: "접근 권한이 없어요."
+
+notExistMember:
+  code: "1300"
+  message: "사용자가 존재하지 않아요."
+
+notExistChallenge:
+  code: "2300"
+  message: "챌린지가 존재하지 않아요."
+
+notExistSubmit:
+  code: "6300"
+  message: "풀이가 존재하지 않아요."
+
+notExistComment:
+  code: "8300"
+  message: "댓글이 존재하지 않아요."
+
+notExistQuestion:
+  code: "5300"
+  message: "질문이 존재하지 않아요."
+
+notExistAnswer:
+  code: "7300"
+  message: "답변이 존재하지 않아요."
+
+notExistChatRoom:
+  code: "9300"
+  message: "채팅방이 존재하지 않아요."
+
+aiBehaviorError:
+  code: "9200"
+  message: "AI가 정상 작동하지 않아요."

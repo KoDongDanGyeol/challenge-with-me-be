@@ -36,7 +36,7 @@ public class ProviderService {
         String profileUrl = oAuthRequestFactory.getProfileUrl(provider);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(httpHeaders);
         ResponseEntity<String> response = restTemplate.postForEntity(profileUrl, request, String.class);
-        log.info(response.getBody());
+        //log.info(response.getBody());
         try {
             if (response.getStatusCode() == HttpStatus.OK) {
                 return extractProfile(response, provider);
