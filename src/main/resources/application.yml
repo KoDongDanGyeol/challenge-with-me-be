@@ -1,7 +1,11 @@
 spring:
   profiles:
-    active: prod
+    active: local
     group:
+      local:
+        - common
       prod:
         - common
-
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
