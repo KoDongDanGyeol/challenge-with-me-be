@@ -38,11 +38,10 @@ public class SolutionService {
     }
 
     // 특정 문제에 대한 풀이 페이지 조회
-    public Page<SolutionDTO> findSolutionPages(int page, int size, String language, String type, Long problemId) {
+    public Page<SolutionDTO> findSolutionPages(int page, int size, String language, String type, Long problemId,Long memberId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
         Page<Object[]> solutions;
         if(type.equals("my")){
-            Long memberId = 0L;
             solutions = solutionRepository.
                     findByIsCorrectTrueAndLanguageAndMemberIdAndProblemId(language, memberId, problemId, pageable);
         } else {
@@ -51,11 +50,6 @@ public class SolutionService {
         }
         return convertToSolutionDTOPage(solutions, pageable);
     }
-
-
-
-
-
 
     private List<SolutionDTO> convertToSolutionDTOList(List<Object[]> submits){
         List<SolutionDTO> solutionDTOs = new ArrayList<>();
