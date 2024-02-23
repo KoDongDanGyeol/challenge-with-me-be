@@ -62,9 +62,9 @@ public class JwtProvider {
         String bearer = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(bearer!=null && bearer.startsWith("Bearer "))
             return bearer.substring("Bearer ".length());
-        else{
-            throw new NotValidTokenException();
-        }
+        else if(bearer == null)
+            return null;
+        throw new NotValidTokenException();
     }
 
     public boolean validateTokenExpirations(String token){
