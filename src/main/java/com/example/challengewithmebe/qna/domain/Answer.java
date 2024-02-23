@@ -18,7 +18,7 @@ public class Answer extends BaseEntity {
     private Long id;
     private String content; // 내용
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member memberId; // 작성자 id
 

@@ -6,10 +6,7 @@ import com.example.challengewithmebe.login.service.LoginService;
 import com.example.challengewithmebe.login.service.ProviderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.naming.CommunicationException;
 
@@ -19,6 +16,11 @@ public class OAuthController {
     
     private final ProviderService providerService;
     private final LoginService loginService;
+
+    @GetMapping("/")
+    public ResponseEntity<?> main(){
+        return ResponseEntity.ok().body("");
+    }
 
     @PostMapping("/api/oauth/login/google")
     public ResponseEntity<LoginResponse> googleSignup(@RequestParam("code") String code) throws CommunicationException {

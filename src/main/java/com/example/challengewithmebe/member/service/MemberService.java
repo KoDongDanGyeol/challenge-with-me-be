@@ -24,6 +24,7 @@ public class MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .imgUrl(member.getImgUrl())
+                .provider(member.getProvider())
                 .build();
 
         return response;
@@ -40,6 +41,7 @@ public class MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .imgUrl(member.getImgUrl())
+                .provider(member.getProvider())
                 .build();
 
         return response;
