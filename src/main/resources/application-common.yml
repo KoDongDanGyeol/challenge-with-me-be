@@ -3,7 +3,7 @@ spring:
     google:
       client_id: ${GOOGLE_CLIENT_ID}
       client_secret: ${GOOGLE_SECRET}
-      redirect: http://localhost:8080/api/oauth/login/google
+      redirect: https://api.challenge-with-me.xyz/api/oauth/login/google
       url:
         login: https://accounts.google.com/o/oauth2/v2/auth
         token: https://oauth2.googleapis.com/token
