@@ -1,7 +1,12 @@
 package com.example.challengewithmebe.qna.service;
 
+import com.example.challengewithmebe.global.exception.auth.OwnerOnlyOperationException;
+import com.example.challengewithmebe.global.exception.notExist.NotExistAnswerException;
+import com.example.challengewithmebe.global.exception.notExist.NotExistQuestionException;
 import com.example.challengewithmebe.member.domain.Member;
+import com.example.challengewithmebe.member.dto.MemberDTO;
 import com.example.challengewithmebe.member.repository.MemberRepository;
+import com.example.challengewithmebe.member.service.MemberService;
 import com.example.challengewithmebe.qna.domain.Answer;
 import com.example.challengewithmebe.qna.domain.Question;
 import com.example.challengewithmebe.qna.dto.AnswerDTO;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QnAService {
 
+    private final MemberService memberService;
     private final EntityManager entityManager;
     private final MemberRepository memberRepository;
     private final AnswerRepository answerRepository;
@@ -43,6 +49,13 @@ public class QnAService {
         return questionDTO;
     }
 
+    // 한 개의 질문과 그에 대한 답변들
+    public QuestionDTO findOneQuestion(Long questionId) {
+        Question q = questionRepository.findById(questionId).orElseThrow(NotExistQuestionException::new);
+        QuestionDTO qDTO = convertToQuestionDTO(q);
+        return qDTO;
+    }
+
     // 특정 문제에 대한 질문 return
     public List<QuestionDTO> questionForOneProblem(Long problemId) {
         List<QuestionDTO> questionDTO =
@@ -51,7 +64,8 @@ public class QnAService {
     }
 
     // 질문 추가
-    public Long addQuestion(QuestionDTO question) {
+    public Long addQuestion(QuestionDTO question, Long memberId) {
+        question.setMemberId(memberId);
         Question q = questionRepository.save(convertToQuestion(question));
         return q.getId();
     }
@@ -67,60 +81,75 @@ public class QnAService {
     }
 
     // 답변 작성
-    public Long addAnswer(AnswerDTO answerDTO) {
+    public Long addAnswer(AnswerDTO answerDTO, Long memberId) {
+        answerDTO.setMemberId(memberId);
         return answerRepository.save(convertToAnswer(answerDTO)).getId();
     }
 
     // 질문 수정
-    public Long updateQuestion(QuestionDTO questionDTO){
-        Optional<Question> existingQuestionOptional = questionRepository.findById(questionDTO.getId());
-        Question question;
-        if(existingQuestionOptional.isEmpty()){
-            return addQuestion(questionDTO);
+    public Long updateQuestion(QuestionDTO questionDTO, Long memberId){
+        Question q = questionRepository.findById(questionDTO.getId()).orElseThrow(NotExistQuestionException::new);
+        if(q.getMemberId().getId() != memberId){
+            throw new OwnerOnlyOperationException();
         }
-
-        question = existingQuestionOptional.get();
-        question.update(questionDTO);
-        return questionRepository.save(question).getId();
+        q.update(questionDTO);
+        return questionRepository.save(q).getId();
     }
 
     // 답변 수정
-    public Long updateAnswer(AnswerDTO answerDTO){
-        Optional<Answer> existingAnswerOptional = answerRepository.findById(answerDTO.getId());
-        Answer answer;
-        if(existingAnswerOptional.isEmpty()){
-            return addAnswer(answerDTO);
+    public Long updateAnswer(AnswerDTO answerDTO, Long memberId){
+        Answer a = answerRepository.findById(answerDTO.getId()).orElseThrow(NotExistAnswerException::new);
+        if(a.getMemberId().getId() != memberId){
+            throw new OwnerOnlyOperationException();
         }
-
-        answer = existingAnswerOptional.get();
-        answer.update(answerDTO);
-        return answerRepository.save(answer).getId();
+        a.update(answerDTO);
+        return answerRepository.save(a).getId();
     }
 
     // 질문 삭제
-    public boolean deleteOneQuestion(Long questionId) {
+    public boolean deleteOneQuestion(Long questionId,Long memberId) {
+        Question q = questionRepository.findById(questionId).orElseThrow(NotExistQuestionException::new);
+        if(q.getMemberId().getId() != memberId){
+            throw new OwnerOnlyOperationException();
+        }
         questionRepository.deleteById(questionId);
         return true;
     }
 
     // 답변 삭제
-    public boolean deleteOneAnswer(Long answerId) {
+    public boolean deleteOneAnswer(Long answerId, Long memberId) {
+        Answer a = answerRepository.findById(answerId).orElseThrow(NotExistAnswerException::new);
+        if(a.getMemberId().getId() != memberId){
+            throw new OwnerOnlyOperationException();
+        }
         answerRepository.deleteById(answerId);
         return true;
     }
 
     // 모든 질문에 대한 미리보기 return
-    public Page<QuestionPreviewDTO> findAllQuestionPreviews(int page, int size){
+    public Page<QuestionPreviewDTO> findAllQuestionPreviews(int page, int size, String type, Long memberId){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "modifiedAt"));
-        Page<Question> questions = questionRepository.findAll(pageable);
+        Page<Question> questions;
+        if(type.equals("my")){
+            questions = questionRepository.findByMemberId_Id(memberId, pageable);
+        }else{
+            questions = questionRepository.findAll(pageable);
+        }
+
         Page<QuestionPreviewDTO> previewDTOS = questions.map(this::convertFromQuestionToQuestionPreviewDTO);
         return previewDTOS;
     }
 
     // 특정 문제에 대한 질문 미리보기 return
-    public Page<QuestionPreviewDTO> findQuestionPreviewsForSpecificProblem(Long problemId,int page, int size){
+    public Page<QuestionPreviewDTO> findQuestionPreviewsForSpecificProblem(Long problemId,int page, int size, String type, Long memberId){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "modifiedAt"));
-        Page<Question> questions = questionRepository.findByProblemId(problemId, pageable);
+        Page<Question> questions;
+        if(type.equals("my")){
+            questions = questionRepository.findByProblemIdAndMemberId_Id(problemId, memberId, pageable);
+        }else {
+            questions = questionRepository.findByProblemId(problemId, pageable);
+        }
+
         Page<QuestionPreviewDTO> previewDTOS = questions.map(this::convertFromQuestionToQuestionPreviewDTO);
         return previewDTOS;
     }
@@ -254,5 +283,10 @@ public class QnAService {
         QuestionDTO q = convertToQuestionDTO(question);
         return convertToQuestionPreviewDTO(q);
     }
+
+    private MemberDTO getMemberInfo(Long memberId){
+        return memberService.getInfo(memberId);
+    }
+
 
 }
