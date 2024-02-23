@@ -30,6 +30,13 @@ public class AuthExceptionAdvice {
                 getMessage("notValidToken.message")));
     }
 
+    //5100
+    @ExceptionHandler(OwnerOnlyOperationException.class)
+    protected ResponseEntity<FailResult> OwnerOnlyOperationException(OwnerOnlyOperationException e){
+        return ResponseEntity.status(400).body(responseService.getFailResult(
+                getMessage("ownerOnlyOperation.code"),
+                getMessage("ownerOnlyOperation.message")));
+    }
 
     private String getMessage(String code){
         return getMessage(code,null);
