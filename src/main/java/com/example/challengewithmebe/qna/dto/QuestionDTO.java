@@ -12,6 +12,7 @@ public class QuestionDTO {
 
     private Long id;
     private Long problemId; // 문제 id
+    private String problemTitle; // 문제 제목
     private String title;  // 질문 제목
     private String imgUrl; // 이미지 Url
     private String content; // 질문 내용

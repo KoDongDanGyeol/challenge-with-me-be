@@ -2,11 +2,15 @@ package com.example.challengewithmebe.qna.service;
 
 import com.example.challengewithmebe.global.exception.auth.OwnerOnlyOperationException;
 import com.example.challengewithmebe.global.exception.notExist.NotExistAnswerException;
+import com.example.challengewithmebe.global.exception.notExist.NotExistChallengeException;
+import com.example.challengewithmebe.global.exception.notExist.NotExistMemberException;
 import com.example.challengewithmebe.global.exception.notExist.NotExistQuestionException;
 import com.example.challengewithmebe.member.domain.Member;
 import com.example.challengewithmebe.member.dto.MemberDTO;
 import com.example.challengewithmebe.member.repository.MemberRepository;
 import com.example.challengewithmebe.member.service.MemberService;
+import com.example.challengewithmebe.problem.domain.Problem;
+import com.example.challengewithmebe.problem.repository.ProblemRepository;
 import com.example.challengewithmebe.qna.domain.Answer;
 import com.example.challengewithmebe.qna.domain.Question;
 import com.example.challengewithmebe.qna.dto.AnswerDTO;
@@ -41,6 +45,7 @@ public class QnAService {
     private final MemberRepository memberRepository;
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
+    private final ProblemRepository problemRepository;
 
     // 모든 질문 return
     public List<QuestionDTO> allQuestions() {
@@ -59,7 +64,7 @@ public class QnAService {
     // 특정 문제에 대한 질문 return
     public List<QuestionDTO> questionForOneProblem(Long problemId) {
         List<QuestionDTO> questionDTO =
-                convertToQuestionDTOs(questionRepository.findByProblemIdOrderByModifiedAtDesc(problemId));
+                convertToQuestionDTOs(questionRepository.findByProblemId_IdOrderByModifiedAtDesc(problemId));
             return questionDTO;
     }
 
@@ -145,9 +150,9 @@ public class QnAService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "modifiedAt"));
         Page<Question> questions;
         if(type.equals("my")){
-            questions = questionRepository.findByProblemIdAndMemberId_Id(problemId, memberId, pageable);
+            questions = questionRepository.findByProblemId_IdAndMemberId_Id(problemId, memberId, pageable);
         }else {
-            questions = questionRepository.findByProblemId(problemId, pageable);
+            questions = questionRepository.findByProblemId_Id(problemId, pageable);
         }
 
         Page<QuestionPreviewDTO> previewDTOS = questions.map(this::convertFromQuestionToQuestionPreviewDTO);
@@ -162,26 +167,6 @@ public class QnAService {
         return dtos;
     }
 
-    // MemberId를 확인하고 null이 아니면 사용자의 정보를, null이면 default를 return
-    private String[] memberCheck(Supplier<Optional<Member>> memberSupplier) {
-        String[] memberInfo = new String[3];
-        Optional<Member> memberOptional = memberSupplier.get(); // Supplier로부터 Optional<Member>를 받아옵니다.
-
-        if (!memberOptional.isPresent()) {
-            // 멤버가 탈퇴한 경우 처리
-            memberInfo[0] = null;
-            memberInfo[1] = "탈퇴한 사용자";
-            memberInfo[2] = "https://default_image.jpg"; // 프로필 이미지 정보가 없으므로 기본 이미지 URL 설정
-        } else {
-            // 멤버가 탈퇴하지 않은 경우
-            Member member = memberOptional.get(); // Optional<Member>에서 Member 인스턴스를 추출
-            memberInfo[0] = String.valueOf(member.getId());
-            memberInfo[1] = member.getName();
-            memberInfo[2] = member.getImgUrl();
-        }
-        return memberInfo;
-    }
-
     private QuestionDTO convertToQuestionDTO(Question question) {
         List<AnswerDTO> answerDTOs = question.getAnswers().stream()
                 .map(this::convertToAnswerDTO) // 여기를 수정했습니다
@@ -193,9 +178,16 @@ public class QnAService {
                 .map(Long::valueOf)
                 .orElse(null);
 
+        String[] problemInfo = problemCheck(Optional.ofNullable(question.getProblemId()));
+
+        Long problemId = Optional.ofNullable(problemInfo[0])
+                .map(Long::valueOf)
+                .orElse(null);
+
         return QuestionDTO.builder()
                 .id(question.getId())
-                .problemId(question.getProblemId())
+                .problemId(problemId)
+                .problemTitle(problemInfo[1])
                 .title(question.getTitle())
                 .imgUrl(question.getImgUrl())
                 .content(question.getContent())
@@ -208,7 +200,6 @@ public class QnAService {
                 .answers(answerDTOs)
                 .build();
     }
-
 
 
     private AnswerDTO convertToAnswerDTO(Answer answer){
@@ -232,19 +223,13 @@ public class QnAService {
     }
 
     private Question convertToQuestion(QuestionDTO question){
+        Member member = memberRepository.findById(question.getMemberId())
+                .orElseThrow(NotExistMemberException::new);
         Optional<Member> memberOptional = memberRepository.findById(question.getMemberId());
-        if(memberOptional.isEmpty()){
-            return Question.builder()
-                    .problemId(question.getProblemId())
-                    .title(question.getTitle())
-                    .imgUrl(question.getImgUrl())
-                    .content(question.getContent())
-                    .build();
-        }
-
-        Member member = memberOptional.get();
+        Problem problem = problemRepository.findById(question.getProblemId())
+                .orElseThrow(NotExistChallengeException::new);
         return Question.builder()
-                .problemId(question.getProblemId())
+                .problemId(problem)
                 .title(question.getTitle())
                 .imgUrl(question.getImgUrl())
                 .content(question.getContent())
@@ -269,6 +254,7 @@ public class QnAService {
         return QuestionPreviewDTO.builder()
                 .id(questionDTO.getId())
                 .problemId(questionDTO.getProblemId())
+                .problemTitle(questionDTO.getProblemTitle())
                 .title(questionDTO.getTitle())
                 .memberId(questionDTO.getMemberId())
                 .answerCounts(questionDTO.getAnswerCounts())
@@ -288,5 +274,42 @@ public class QnAService {
         return memberService.getInfo(memberId);
     }
 
+    // MemberId를 확인하고 null이 아니면 사용자의 정보를, null이면 default를 return
+    private String[] memberCheck(Supplier<Optional<Member>> memberSupplier) {
+        String[] memberInfo = new String[3];
+        Optional<Member> memberOptional = memberSupplier.get(); // Supplier로부터 Optional<Member>를 받아옵니다.
+
+        if (!memberOptional.isPresent()) {
+            // 멤버가 탈퇴한 경우 처리
+            memberInfo[0] = null;
+            memberInfo[1] = "탈퇴한 사용자";
+            memberInfo[2] = "https://default_image.jpg"; // 프로필 이미지 정보가 없으므로 기본 이미지 URL 설정
+        } else {
+            // 멤버가 탈퇴하지 않은 경우
+            Member member = memberOptional.get(); // Optional<Member>에서 Member 인스턴스를 추출
+            memberInfo[0] = String.valueOf(member.getId());
+            memberInfo[1] = member.getName();
+            memberInfo[2] = member.getImgUrl();
+        }
+        return memberInfo;
+    }
+
+    private String[] problemCheck(Optional<Problem> problemOptional) {
+        String[] problemInfo = new String[2];
+
+        if(problemOptional.isEmpty()){
+            // 문제가 삭제된 경우
+            problemInfo[0] = null;
+            problemInfo[1] = "존재하지 않는 문제입니다.";
+            return problemInfo;
+        }
+
+        Problem p = problemOptional.get();
+        problemInfo[0] = String.valueOf(p.getId());
+        problemInfo[1] = p.getTitle();
+        return problemInfo;
+
+
+    }
 
 }
