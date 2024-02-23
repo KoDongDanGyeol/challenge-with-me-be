@@ -24,7 +24,7 @@ public class Question extends BaseEntity {
     private String imgUrl; // 이미지 Url
     private String content; // 질문 내용
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member memberId; // 작성자 id
 
@@ -36,5 +36,9 @@ public class Question extends BaseEntity {
         this.title = questionDTO.getTitle();
         this.content = questionDTO.getContent();
         this.imgUrl = questionDTO.getImgUrl();
+    }
+
+    public void memberUpdate(Member member){
+        this.memberId = member;
     }
 }
