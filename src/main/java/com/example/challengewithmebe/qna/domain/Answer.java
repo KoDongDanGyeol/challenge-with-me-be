@@ -18,7 +18,7 @@ public class Answer extends BaseEntity {
     private Long id;
     private String content; // 내용
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "member_id")
     private Member memberId; // 작성자 id
 
@@ -30,5 +30,9 @@ public class Answer extends BaseEntity {
 
     public void update(AnswerDTO answerDTO){
         this.content = answerDTO.getContent();
+    }
+
+    public void memberUpdate(Member member){
+        this.memberId = member;
     }
 }
