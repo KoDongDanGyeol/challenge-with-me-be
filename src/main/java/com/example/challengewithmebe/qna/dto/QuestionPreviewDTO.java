@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class QuestionPreviewDTO {
     private Long id;
     private Long problemId; // 문제 id
+    private String problemTitle; // 문제 제목
     private String title;  // 질문 제목
     private Long memberId; // 작성자 id
     private int answerCounts; // 해당 질문에 대한 답변 개수
