@@ -18,8 +18,9 @@ public class OAuthController {
     private final LoginService loginService;
 
     @GetMapping("/")
-    public ResponseEntity<?> main(){
-        return ResponseEntity.ok().body("");
+    public ResponseEntity<String> main(){
+        String response = "hello";
+        return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/api/oauth/login/google")
