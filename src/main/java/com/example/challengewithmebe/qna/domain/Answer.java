@@ -31,8 +31,4 @@ public class Answer extends BaseEntity {
     public void update(AnswerDTO answerDTO){
         this.content = answerDTO.getContent();
     }
-
-    public void memberUpdate(Member member){
-        this.memberId = member;
-    }
 }

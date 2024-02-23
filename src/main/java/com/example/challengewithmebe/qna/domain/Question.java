@@ -38,7 +38,4 @@ public class Question extends BaseEntity {
         this.imgUrl = questionDTO.getImgUrl();
     }
 
-    public void memberUpdate(Member member){
-        this.memberId = member;
-    }
 }
