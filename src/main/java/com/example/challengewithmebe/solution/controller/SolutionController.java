@@ -1,7 +1,9 @@
 package com.example.challengewithmebe.solution.controller;
 
+import com.example.challengewithmebe.global.security.jwt.JwtProvider;
 import com.example.challengewithmebe.solution.dto.SolutionDTO;
 import com.example.challengewithmebe.solution.service.SolutionService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.Map;
 public class SolutionController {
 
     private final SolutionService solutionService;
+    private final JwtProvider jwtProvider;
 
     @GetMapping(value = {"", "/"})
     public ResponseEntity<List<SolutionDTO>> getAllSolutions(){
@@ -43,8 +46,10 @@ public class SolutionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "java") String language,
-            @RequestParam(defaultValue = "all") String type) {
-        Page<SolutionDTO> solutions = solutionService.findSolutionPages(page, size, language, type, problemId);
+            @RequestParam(defaultValue = "all") String type,
+            HttpServletRequest request) {
+        Long memberId = Long.valueOf(jwtProvider.extractId(request));
+        Page<SolutionDTO> solutions = solutionService.findSolutionPages(page, size, language, type, problemId, memberId);
         return ResponseEntity.ok(solutions);
     }
 

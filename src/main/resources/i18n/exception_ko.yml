@@ -49,3 +49,7 @@ notExistChatRoom:
 aiBehaviorError:
   code: "9200"
   message: "AI가 정상 작동하지 않아요."
+
+ownerOnlyOperation:
+  code: "5100"
+  message: "작성자만 수정, 삭제가 가능해요."
