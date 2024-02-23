@@ -5,6 +5,8 @@ import com.example.challengewithmebe.global.exception.notExist.NotExistMemberExc
 import com.example.challengewithmebe.member.domain.Member;
 import com.example.challengewithmebe.member.dto.MemberDTO;
 import com.example.challengewithmebe.member.repository.MemberRepository;
+import com.example.challengewithmebe.qna.repository.AnswerRepository;
+import com.example.challengewithmebe.qna.repository.QuestionRepository;
 import com.example.challengewithmebe.solution.repository.SolutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final SolutionRepository solutionRepository;
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
 
     public MemberDTO getInfo(Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(NotExistMemberException::new);
@@ -24,6 +28,7 @@ public class MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .imgUrl(member.getImgUrl())
+                .provider(member.getProvider())
                 .build();
 
         return response;
@@ -40,6 +45,7 @@ public class MemberService {
                 .name(member.getName())
                 .email(member.getEmail())
                 .imgUrl(member.getImgUrl())
+                .provider(member.getProvider())
                 .build();
 
         return response;
