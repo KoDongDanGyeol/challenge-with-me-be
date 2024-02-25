@@ -31,7 +31,6 @@ public class LoginService {
                     .role(Role.USER)
                     .imgUrl(oAuthProfile.getImageUrl())
                     .provider(oAuthProfile.getProvider())
-                    .providerId(oAuthProfile.getProviderId())
                     .build();
 
             memberRepository.save(member);
