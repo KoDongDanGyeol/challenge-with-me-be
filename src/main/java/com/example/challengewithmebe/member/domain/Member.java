@@ -23,7 +23,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String provider; //로그인 종류
-    private String providerId; //소셜 로그인 시 부여되는 id
 
     public void editName(String name){
         this.name = name;

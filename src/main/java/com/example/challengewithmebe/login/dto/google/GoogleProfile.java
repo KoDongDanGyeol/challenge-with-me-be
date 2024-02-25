@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class GoogleProfile implements OAuthProfile {
-    private String providerId;
     private String provider;
     private String name;
     private String email;
