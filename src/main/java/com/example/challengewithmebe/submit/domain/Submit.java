@@ -19,11 +19,17 @@ public class Submit extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long problemId; //문제id
     private Long memberId; //회원id
     private boolean isCorrect; //정답여부
     private String submitCode; //제출코드
     private String language; //언어
-    private String status; //푼 문제, 안 푼 문제
+    private String status; //문제 상태?
+
+    public Submit(Long problemId, Long memberId, boolean isCorrect, String code) {
+        this.problemId = problemId;
+        this.memberId = memberId;
+        this.isCorrect = isCorrect;
+        this.submitCode = code;
+    }
 }
