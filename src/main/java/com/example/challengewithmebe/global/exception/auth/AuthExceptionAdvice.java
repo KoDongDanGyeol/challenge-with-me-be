@@ -38,6 +38,14 @@ public class AuthExceptionAdvice {
                 getMessage("ownerOnlyOperation.message")));
     }
 
+    //0106
+    @ExceptionHandler(MustBeLoggedInException.class)
+    protected ResponseEntity<FailResult> MustBeLoggedInException(MustBeLoggedInException e){
+        return ResponseEntity.status(400).body(responseService.getFailResult(
+                getMessage("mustBeLoggedIn.code"),
+                getMessage("mustBeLoggedIn.message")));
+    }
+
     private String getMessage(String code){
         return getMessage(code,null);
     }
