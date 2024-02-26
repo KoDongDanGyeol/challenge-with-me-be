@@ -1,6 +1,6 @@
 package com.example.challengewithmebe.problem.domain;
 
-import com.example.challengewithmebe.global.domain.BaseEntity;
+import com.example.challengewithmebe.global.app.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
