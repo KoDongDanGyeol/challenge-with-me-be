@@ -53,3 +53,7 @@ aiBehaviorError:
 ownerOnlyOperation:
   code: "5100"
   message: "작성자만 수정, 삭제가 가능해요."
+
+mustBeLoggedIn:
+  code: "0106"
+  message: "로그인 후에 사용 가능한 기능이에요."

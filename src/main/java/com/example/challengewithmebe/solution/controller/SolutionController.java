@@ -48,7 +48,11 @@ public class SolutionController {
             @RequestParam(defaultValue = "java") String language,
             @RequestParam(defaultValue = "all") String type,
             HttpServletRequest request) {
-        Long memberId = Long.valueOf(jwtProvider.extractId(request));
+        Long memberId = 0L;
+        if(type.equals("my")){
+            jwtProvider.isLoggedIn(request);
+            memberId = Long.valueOf(jwtProvider.extractId(request));
+        }
         Page<SolutionDTO> solutions = solutionService.findSolutionPages(page, size, language, type, problemId, memberId);
         return ResponseEntity.ok(solutions);
     }

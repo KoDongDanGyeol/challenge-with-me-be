@@ -29,6 +29,7 @@ public class AnswerController {
     public ResponseEntity<Long> postAnswer(
             @RequestBody AnswerDTO answerDTO,
             HttpServletRequest request){
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         Long savedId = qnAService.addAnswer(answerDTO,memberId);
         return ResponseEntity.ok(savedId);
@@ -37,6 +38,7 @@ public class AnswerController {
     // 답변 삭제
     @DeleteMapping("/{answerId}")
     public ResponseEntity<Boolean> deleteAnswer(@PathVariable Long answerId, HttpServletRequest request) {
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         return ResponseEntity.ok(qnAService.deleteOneAnswer(answerId,memberId));
     }
@@ -46,6 +48,7 @@ public class AnswerController {
     public ResponseEntity<Long> putAnswer(
             @RequestBody AnswerDTO answer,
             HttpServletRequest request){
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         Long updatedId = qnAService.updateAnswer(answer, memberId);
         return ResponseEntity.ok(updatedId);

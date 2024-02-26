@@ -45,6 +45,7 @@ public class QuestionController {
     public ResponseEntity<Long> postQuestion(
             @RequestBody QuestionDTO question,
             HttpServletRequest request){
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         Long savedId = qnAService.addQuestion(question, memberId);
         return ResponseEntity.ok(savedId);
@@ -53,6 +54,7 @@ public class QuestionController {
     // 질문 삭제
     @DeleteMapping("/{questionId}")
     public ResponseEntity<Boolean> deleteQuestion(@PathVariable Long questionId, HttpServletRequest request) {
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         Boolean completelyDeleted = qnAService.deleteOneQuestion(questionId, memberId);
         return ResponseEntity.ok(completelyDeleted);
@@ -63,6 +65,7 @@ public class QuestionController {
     public ResponseEntity<Long> putQuestion(
             @RequestBody QuestionDTO question,
             HttpServletRequest request){
+        jwtProvider.isLoggedIn(request);
         Long memberId = Long.valueOf(jwtProvider.extractId(request));
         Long updatedId = qnAService.updateQuestion(question, memberId);
         return ResponseEntity.ok(updatedId);
@@ -75,7 +78,11 @@ public class QuestionController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "all")String type,
             HttpServletRequest request) {
-        Long memberId = Long.valueOf(jwtProvider.extractId(request));
+        Long memberId = 0L;
+        if(type.equals("my")){
+            jwtProvider.isLoggedIn(request);
+            memberId = Long.valueOf(jwtProvider.extractId(request));
+        }
         Page<QuestionPreviewDTO> questions = qnAService.findAllQuestionPreviews(page, size, type, memberId);
         return ResponseEntity.ok(questions);
     }
@@ -88,7 +95,11 @@ public class QuestionController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "all")String type,
             HttpServletRequest request) {
-        Long memberId = Long.valueOf(jwtProvider.extractId(request));
+        Long memberId = 0L;
+        if(type.equals("my")){
+            jwtProvider.isLoggedIn(request);
+            memberId = Long.valueOf(jwtProvider.extractId(request));
+        }
         Page<QuestionPreviewDTO> questions = qnAService.findQuestionPreviewsForSpecificProblem(problemId, page, size, type, memberId);
         return ResponseEntity.ok(questions);
     }

@@ -1,5 +1,6 @@
 package com.example.challengewithmebe.global.security.jwt;
 
+import com.example.challengewithmebe.global.exception.auth.MustBeLoggedInException;
 import com.example.challengewithmebe.global.exception.auth.NotValidTokenException;
 import com.example.challengewithmebe.global.security.userdetails.CustomUserDetailService;
 import io.jsonwebtoken.Claims;
@@ -89,5 +90,12 @@ public class JwtProvider {
         header.put("typ", "JWT");
         header.put("alg", "HS256");
         return header;
+    }
+
+    //로그인 시에만 사용 가능한 api 호출 시 로그인 여부 확인
+    public void isLoggedIn(HttpServletRequest request){
+        if(resolveToken(request) == null){
+            throw new MustBeLoggedInException();
+        }
     }
 }
